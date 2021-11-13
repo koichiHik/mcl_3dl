@@ -165,12 +165,7 @@ protected:
       ROS_ERROR("Discarded invalid initialpose. The orientation must be unit quaternion.");
       return;
     }
-    if (init_pose_last_ < msg->header.stamp) {
-      ROS_ERROR("Discarded invalid initialpose. Time stamp is not updated.");
-      return;
-    }
 
-    init_pose_last_ = msg->header.stamp;
     geometry_msgs::PoseStamped pose_in, pose;
     pose_in.header = msg->header;
     pose_in.pose = msg->pose.pose;
@@ -1450,7 +1445,6 @@ protected:
 
   Parameters params_;
 
-  ros::Time init_pose_last_;
   ros::Time match_output_last_;
   ros::Time odom_last_;
   bool has_map_;
