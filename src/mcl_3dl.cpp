@@ -165,7 +165,12 @@ protected:
       ROS_ERROR("Discarded invalid initialpose. The orientation must be unit quaternion.");
       return;
     }
+    if (init_pose_last_ < msg->header.stamp) {
+      ROS_ERROR("Discarded invalid initialpose. Time stamp is not updated.");
+      return;
+    }
 
+    init_pose_last_ = msg->header.stamp;
     geometry_msgs::PoseStamped pose_in, pose;
     pose_in.header = msg->header;
     pose_in.pose = msg->pose.pose;
@@ -1172,10 +1177,14 @@ protected:
     pc_map_.reset(new pcl::PointCloud<PointType>);
     pc_map2_.reset();
     pc_update_.reset();
+
+    /*
     pcl::VoxelGrid18<PointType> ds;
     ds.setInputCloud(map_cloud);
     ds.setLeafSize(params_.map_downsample_x_, params_.map_downsample_y_, params_.map_downsample_z_);
     ds.filter(*pc_map_);
+    */
+    pc_map_ = map_cloud->makeShared();
     pc_all_accum_.reset(new pcl::PointCloud<PointType>);
     has_map_ = true;
 
@@ -1441,6 +1450,7 @@ protected:
 
   Parameters params_;
 
+  ros::Time init_pose_last_;
   ros::Time match_output_last_;
   ros::Time odom_last_;
   bool has_map_;
